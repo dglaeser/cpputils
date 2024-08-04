@@ -13,7 +13,7 @@ function (cpputils_add_test NAME SOURCES)
     add_executable(${NAME} ${SOURCES})
     add_test(NAME ${NAME} COMMAND ./${NAME})
     target_link_libraries(${NAME} PRIVATE Boost::ut)
-    target_include_directories(${NAME} PRIVATE ${CMAKE_SOURCE_DIR}/../cpputils)
+    target_include_directories(${NAME} PRIVATE ${CMAKE_SOURCE_DIR}/../src)
 endfunction()
 
 enable_testing()
