@@ -6,13 +6,6 @@
 
 namespace cpputils {
 
-struct automatic {};
-
-
-template<typename T>
-struct always_false : std::false_type {};
-
-
 template<std::size_t i>
 using index_constant = std::integral_constant<std::size_t, i>;
 
