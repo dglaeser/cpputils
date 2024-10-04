@@ -89,9 +89,8 @@ namespace detail {
         constexpr index index_of() const noexcept { return {}; }
         constexpr index index_of(const T&) const noexcept { return {}; }
 
-        constexpr const std::remove_cvref_t<T>& get(const index&) const noexcept {
-            return _storage.get();
-        }
+        constexpr const std::remove_cvref_t<T>& get(const index&) const noexcept { return _storage.get(); }
+        constexpr std::remove_cvref_t<T>& get(const index&) noexcept { return _storage.get(); }
 
     private:
         value_or_reference<T> _storage;
