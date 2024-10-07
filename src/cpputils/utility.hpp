@@ -59,6 +59,10 @@ namespace detail {
         template<typename _T> requires(std::is_same_v<std::remove_cvref_t<T>, std::remove_cvref_t<_T>>)
         constexpr index index_of() const noexcept { return {}; }
         constexpr index index_of(const T&) const noexcept { return {}; }
+
+        constexpr T get(const index&) const noexcept requires(std::is_default_constructible_v<T>) {
+            return T{};
+        }
     };
 
     template<typename... Ts>
@@ -67,6 +71,7 @@ namespace detail {
     template<std::size_t... I, typename... Ts>
     struct indexed<std::index_sequence<I...>, Ts...> : indexed_element<I, Ts>... {
         using indexed_element<I, Ts>::index_of...;
+        using indexed_element<I, Ts>::get...;
     };
 
 }  // namespace detail

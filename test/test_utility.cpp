@@ -49,6 +49,11 @@ int main() {
 
         static_assert(indexed.index_of(double{}).value == 2);
         static_assert(indexed.template index_of<double>().value == 2);
+
+        static_assert(std::is_same_v<
+            decltype(indexed.get(indexed.template index_of<double>())),
+            double
+        >);
     };
 
     "variadic_accessor"_test = [] () {
