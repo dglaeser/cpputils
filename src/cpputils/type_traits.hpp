@@ -23,6 +23,14 @@ struct type_list {
     static constexpr std::size_t size = sizeof...(Ts);
 };
 
+//! Type trait to get the first type in a list of types
+template<typename... T>
+struct first;
+template<typename T, typename... Ts>
+struct first<type_list<T, Ts...>> : std::type_identity<T> {};
+template<typename... T>
+using first_t = typename first<T...>::type;
+
 
 #ifndef DOXYGEN
 namespace detail {
@@ -40,13 +48,6 @@ struct is_complete : std::bool_constant<!decltype(detail::is_incomplete(std::dec
 template<typename T>
 inline constexpr bool is_complete_v = is_complete<T>::value;
 
-//! Type trait to get the first type in a list of types
-template<typename... T>
-struct first_type;
-template<typename T, typename... Ts>
-struct first_type<type_list<T, Ts...>> : std::type_identity<T> {};
-template<typename... T>
-using first_type_t = typename first_type<T...>::type;
 
 //! Type trait to check if a given type is contained in the provided list of types
 template<typename T, typename... Ts>
