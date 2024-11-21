@@ -14,14 +14,14 @@ int main() {
     "value_or_reference_by_temporary"_test = [] () {
         cpputils::value_or_reference storage{std::vector<int>{42}};
         static_assert(!decltype(storage)::holds_reference);
-        static_assert(std::is_same_v<typename decltype(storage)::stored, std::vector<int>>);
+        static_assert(std::is_same_v<typename decltype(storage)::stored_t, std::vector<int>>);
     };
 
     "value_or_reference_by_reference"_test = [] () {
         std::vector<int> v{42};
         cpputils::value_or_reference storage{v};
         static_assert(decltype(storage)::holds_reference);
-        static_assert(std::is_same_v<typename decltype(storage)::stored, std::vector<int>&>);
+        static_assert(std::is_same_v<typename decltype(storage)::stored_t, std::vector<int>&>);
         expect(cpputils::is_same_object(v, storage.get()));
     };
 
@@ -29,7 +29,7 @@ int main() {
         const std::vector<int> v{42};
         cpputils::value_or_reference storage{v};
         static_assert(decltype(storage)::holds_reference);
-        static_assert(std::is_same_v<typename decltype(storage)::stored, const std::vector<int>&>);
+        static_assert(std::is_same_v<typename decltype(storage)::stored_t, const std::vector<int>&>);
         expect(cpputils::is_same_object(v, storage.get()));
     };
 
