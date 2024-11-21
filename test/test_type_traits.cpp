@@ -4,8 +4,8 @@
 
 #include <cpputils/type_traits.hpp>
 
-struct Complete {};
-struct Incomplete;
+struct complete {};
+struct incomplete;
 
 int main() {
 
@@ -62,8 +62,8 @@ int main() {
         static_assert(!never_reference::template type<int&>::value);
     }
     {
-        static_assert(cpputils::is_complete_v<Complete>);
-        static_assert(!cpputils::is_complete_v<Incomplete>);
+        static_assert(cpputils::is_complete_v<complete>);
+        static_assert(!cpputils::is_complete_v<incomplete>);
     }
     {
         using list = cpputils::type_list<char, int, double>;
