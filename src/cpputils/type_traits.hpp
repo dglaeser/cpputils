@@ -70,19 +70,16 @@ inline constexpr bool contains_decayed_v = contains_decayed<T, Ts...>::value;
 //! Type trait to check if all provided types are unique
 template<typename... T>
 struct are_unique;
+template<> struct are_unique<> : std::true_type {};
+template<typename T> struct are_unique<T> : std::true_type {};
+template<typename T1, typename T2> struct are_unique<T1, T2> : std::bool_constant<!std::is_same_v<T1, T2>> {};
 template<typename T1, typename T2, typename... Ts>
 struct are_unique<T1, T2, Ts...> {
     static constexpr bool value =
-        are_unique<T1, T2>::value &&
-        are_unique<T1, Ts...>::value &&
+        are_unique<T1, T2>::value and
+        are_unique<T1, Ts...>::value and
         are_unique<T2, Ts...>::value;
 };
-template<typename T1, typename T2>
-struct are_unique<T1, T2> : std::bool_constant<!std::is_same_v<T1, T2>> {};
-template<typename T>
-struct are_unique<T> : std::true_type {};
-template<>
-struct are_unique<> : std::true_type {};
 template<typename... T>
 struct are_unique<type_list<T...>> : are_unique<T...> {};
 template<typename... Ts>
