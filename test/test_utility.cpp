@@ -22,7 +22,7 @@ int main() {
         cpputils::value_or_reference storage{v};
         static_assert(decltype(storage)::holds_reference);
         static_assert(std::is_same_v<typename decltype(storage)::stored_t, std::vector<int>&>);
-        expect(cpputils::is_same_object(v, storage.get()));
+        expect(eq(&v, &storage.get()));
     };
 
     "value_or_reference_by_const_reference"_test = [] () {
@@ -30,13 +30,7 @@ int main() {
         cpputils::value_or_reference storage{v};
         static_assert(decltype(storage)::holds_reference);
         static_assert(std::is_same_v<typename decltype(storage)::stored_t, const std::vector<int>&>);
-        expect(cpputils::is_same_object(v, storage.get()));
-    };
-
-    "is_same_object"_test = [] () {
-        int a = 1;
-        const int& b = a;
-        expect(cpputils::is_same_object(a, b));
+        expect(eq(&v, &storage.get()));
     };
 
     "indexed"_test = [] () {
