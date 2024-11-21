@@ -64,6 +64,7 @@ int main() {
     {
         using list = cpputils::type_list<char, int, double>;
         static_assert(std::is_same_v<cpputils::first_t<list>, char>);
+        static_assert(std::is_same_v<cpputils::first_t<char, int, double>, char>);
     }
 
     return EXIT_SUCCESS;

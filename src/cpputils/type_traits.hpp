@@ -27,7 +27,9 @@ struct type_list {
 template<typename... T>
 struct first;
 template<typename T, typename... Ts>
-struct first<type_list<T, Ts...>> : std::type_identity<T> {};
+struct first<T, Ts...> : std::type_identity<T> {};
+template<typename T, typename... Ts>
+struct first<type_list<T, Ts...>> : first<T, Ts...> {};
 template<typename... T>
 using first_t = typename first<T...>::type;
 
