@@ -19,15 +19,9 @@ struct decayed_trait {
 
 //! Represents a list of types
 template<typename... Ts>
-struct type_list {};
-
-//! Type trait to get the size of a list of types
-template<typename T>
-struct type_list_size;
-template<typename... T>
-struct type_list_size<type_list<T...>> : std::integral_constant<std::size_t, sizeof...(T)> {};
-template<typename T>
-inline constexpr std::size_t type_list_size_v = type_list_size<T>::value;
+struct type_list {
+    static constexpr std::size_t size = sizeof...(Ts);
+};
 
 
 #ifndef DOXYGEN

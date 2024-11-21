@@ -11,7 +11,7 @@ int main() {
 
     {
         using unique = cpputils::unique_types_t<int, char, int, double, int, double>;
-        static_assert(cpputils::type_list_size_v<unique> == 3);
+        static_assert(unique::size == 3);
         static_assert(cpputils::contains_decayed_v<int, unique>);
         static_assert(cpputils::contains_decayed_v<char, unique>);
         static_assert(cpputils::contains_decayed_v<double, unique>);
@@ -22,14 +22,14 @@ int main() {
 
         using unique = cpputils::unique_types_t<types>;
         static_assert(cpputils::are_unique_v<unique>);
-        static_assert(cpputils::type_list_size_v<unique> == 3);
+        static_assert(unique::size == 3);
         static_assert(cpputils::contains_decayed_v<int, unique>);
         static_assert(cpputils::contains_decayed_v<char, unique>);
         static_assert(cpputils::contains_decayed_v<double, unique>);
     }
     {
         using merged = cpputils::merged_types_t<cpputils::type_list<int>, cpputils::type_list<char, double>>;
-        static_assert(cpputils::type_list_size_v<merged> == 3);
+        static_assert(merged::size == 3);
         static_assert(cpputils::contains_decayed_v<int, merged>);
         static_assert(cpputils::contains_decayed_v<char, merged>);
         static_assert(cpputils::contains_decayed_v<double, merged>);
@@ -38,7 +38,7 @@ int main() {
         using unique_merged = cpputils::unique_types_t<
             cpputils::merged_types_t<cpputils::type_list<int, char, double>, cpputils::type_list<char, double>>
         >;
-        static_assert(cpputils::type_list_size_v<unique_merged> == 3);
+        static_assert(unique_merged::size == 3);
         static_assert(cpputils::contains_decayed_v<int, unique_merged>);
         static_assert(cpputils::contains_decayed_v<char, unique_merged>);
         static_assert(cpputils::contains_decayed_v<double, unique_merged>);
@@ -48,7 +48,7 @@ int main() {
             std::is_lvalue_reference,
             int, char, int&, const double&, std::vector<int>&&, std::vector<double>
         >;
-        static_assert(cpputils::type_list_size_v<filtered> == 2);
+        static_assert(filtered::size == 2);
         static_assert(cpputils::is_any_of_v<int&, filtered>);
         static_assert(cpputils::is_any_of_v<const double&, filtered>);
     }
