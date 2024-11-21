@@ -3,12 +3,12 @@
 #include <type_traits>
 #include <concepts>
 #include <utility>
-#include <memory>
 
 #include <cpputils/type_traits.hpp>
 
 namespace cpputils {
 
+//! Stores either an instance or a reference to T, depending on the constructor argument
 template<typename T>
 class value_or_reference {
 public:
@@ -50,7 +50,6 @@ namespace detail {
 
     template<typename... Ts>
     struct indexed;
-
     template<std::size_t... I, typename... Ts>
     struct indexed<std::index_sequence<I...>, Ts...> : indexed_element<I, Ts>... {
         using indexed_element<I, Ts>::index_of...;
@@ -60,6 +59,7 @@ namespace detail {
 }  // namespace detail
 #endif  // DOXYGEN
 
+//! A list of unique types, where each type is assigned a unique index
 template<typename... Ts> requires(are_unique_v<Ts...>)
 struct indexed : detail::indexed<std::make_index_sequence<sizeof...(Ts)>, Ts...> {};
 
@@ -97,6 +97,7 @@ namespace detail {
 }  // namespace detail
 #endif  // DOXYGEN
 
+//! Stores a set unique types by reference or value and provides access to them via unique indices
 template<typename... Ts>
     requires(are_unique_v<Ts...>)
 struct variadic_accessor : detail::variadic_accessor<std::make_index_sequence<sizeof...(Ts)>, Ts...> {
