@@ -164,10 +164,10 @@ namespace detail {
 
 //! Type trait to filter types by a given predicate
 template<template<typename> typename filter, typename... Ts>
-struct filtered_types : detail::filtered_types_impl<filter, type_list<Ts...>, type_list<>> {};
+struct filtered : detail::filtered_types_impl<filter, type_list<Ts...>, type_list<>> {};
 template<template<typename> typename filter, typename... Ts>
-struct filtered_types<filter, type_list<Ts...>> : detail::filtered_types_impl<filter, type_list<Ts...>, type_list<>> {};
+struct filtered<filter, type_list<Ts...>> : detail::filtered_types_impl<filter, type_list<Ts...>, type_list<>> {};
 template<template<typename> typename filter, typename... Ts>
-using filtered_types_t = typename filtered_types<filter, Ts...>::type;
+using filtered_t = typename filtered<filter, Ts...>::type;
 
 }  // namespace cpputils

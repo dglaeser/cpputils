@@ -49,7 +49,7 @@ int main() {
         static_assert(cpputils::contains_decayed_v<double, unique_merged>);
     }
     {
-        using filtered = cpputils::filtered_types_t<
+        using filtered = cpputils::filtered_t<
             std::is_lvalue_reference,
             int, char, int&, const double&, std::vector<int>&&, std::vector<double>
         >;
