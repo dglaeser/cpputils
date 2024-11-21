@@ -6,21 +6,22 @@
 
 namespace cpputils {
 
+//! Represents a compile-time index
 template<std::size_t i>
 using index_constant = std::integral_constant<std::size_t, i>;
 
-
+//! Wraps a type trait to evaluate it with the decay_t of a given type
 template<template<typename> typename trait>
 struct decayed_trait {
     template<typename T>
     struct type : trait<std::decay_t<T>> {};
 };
 
-
+//! Represents a list of types
 template<typename... Ts>
 struct type_list {};
 
-
+//! Type trait to get the size of a list of types
 template<typename T>
 struct type_list_size;
 template<typename... T>
@@ -39,12 +40,13 @@ namespace detail {
 }  // end namespace detail
 #endif  // DOXYGEN
 
+//! Exposes if a given type is complete (i.e. fully defined)
 template<typename T>
 struct is_complete : std::bool_constant<!decltype(detail::is_incomplete(std::declval<T*>()))::value> {};
 template<typename T>
 inline constexpr bool is_complete_v = is_complete<T>::value;
 
-
+//! Type trait to get the first type in a list of types
 template<typename... T>
 struct first_type;
 template<typename T, typename... Ts>
@@ -52,7 +54,7 @@ struct first_type<type_list<T, Ts...>> : std::type_identity<T> {};
 template<typename... T>
 using first_type_t = typename first_type<T...>::type;
 
-
+//! Type trait to check if a given type is contained in the provided list of types
 template<typename T, typename... Ts>
 struct is_any_of : std::bool_constant<std::disjunction_v<std::is_same<T, Ts>...>> {};
 template<typename T, typename... Ts>
@@ -60,7 +62,7 @@ struct is_any_of<T, type_list<Ts...>> : is_any_of<T, Ts...> {};
 template<typename T, typename... Ts>
 inline constexpr bool is_any_of_v = is_any_of<T, Ts...>::value;
 
-
+//! Type trait to check if the decay_t of a type matches with the decay_t of any of the types in the provided list
 template<typename T, typename... Ts>
 struct contains_decayed : is_any_of<std::decay_t<T>, std::decay_t<Ts>...> {};
 template<typename T, typename... Ts>
@@ -68,7 +70,7 @@ struct contains_decayed<T, type_list<Ts...>> : contains_decayed<T, Ts...> {};
 template<typename T, typename... Ts>
 inline constexpr bool contains_decayed_v = contains_decayed<T, Ts...>::value;
 
-
+//! Type trait to check if all provided types are unique
 template<typename... T>
 struct are_unique;
 template<typename T1, typename T2, typename... Ts>
@@ -128,7 +130,7 @@ namespace detail {
 }  // namespace detail
 #endif  // DOXYGEN
 
-
+//! Type trait to make a list of unique types from a list of types
 template<typename T, typename... Ts>
 struct unique_types : detail::unique_types<T, Ts...> {};
 template<typename... Ts> requires(sizeof...(Ts) > 0)
@@ -138,6 +140,7 @@ struct unique_types<type_list<>> : std::type_identity<type_list<>> {};
 template<typename A, typename... Ts>
 using unique_types_t = typename unique_types<A, Ts...>::type;
 
+//! Type trait to merge to lists of types
 template<typename A, typename... Ts>
 struct merged_types : detail::merged_types<A, Ts...> {};
 template<typename A, typename... Ts>
@@ -165,6 +168,7 @@ namespace detail {
 }  // namespace detail
 #endif  // DOXYGEN
 
+//! Type trait to filter types by a given predicate
 template<template<typename> typename filter, typename... Ts>
 struct filtered_types : detail::filtered_types_impl<filter, type_list<Ts...>, type_list<>> {};
 template<template<typename> typename filter, typename... Ts>
