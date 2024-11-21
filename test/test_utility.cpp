@@ -50,19 +50,19 @@ int main() {
         >);
     };
 
-    "variadic_accessor"_test = [] () {
-        cpputils::variadic_accessor accessor{int{42}, char{'K'}, double{12.0}};
-        static_assert(accessor.index_of(int{}).value == 0);
-        static_assert(accessor.template index_of<int>().value == 0);
-        expect(eq(accessor.get(accessor.template index_of<int>()), 42));
+    "indexed_tuple"_test = [] () {
+        cpputils::indexed_tuple tuple{int{42}, char{'K'}, double{12.0}};
+        static_assert(tuple.index_of(int{}).value == 0);
+        static_assert(tuple.template index_of<int>().value == 0);
+        expect(eq(tuple.get(tuple.template index_of<int>()), 42));
 
-        static_assert(accessor.index_of(char{}).value == 1);
-        static_assert(accessor.template index_of<char>().value == 1);
-        expect(eq(accessor.get(accessor.template index_of<char>()), 'K'));
+        static_assert(tuple.index_of(char{}).value == 1);
+        static_assert(tuple.template index_of<char>().value == 1);
+        expect(eq(tuple.get(tuple.template index_of<char>()), 'K'));
 
-        static_assert(accessor.index_of(double{}).value == 2);
-        static_assert(accessor.template index_of<double>().value == 2);
-        expect(eq(accessor.get(accessor.template index_of<double>()), 12.0));
+        static_assert(tuple.index_of(double{}).value == 2);
+        static_assert(tuple.template index_of<double>().value == 2);
+        expect(eq(tuple.get(tuple.template index_of<double>()), 12.0));
 
     };
 
