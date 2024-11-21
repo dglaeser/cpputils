@@ -3,6 +3,7 @@
 #include <type_traits>
 #include <concepts>
 #include <utility>
+#include <ostream>
 
 #include <cpputils/type_traits.hpp>
 
@@ -108,5 +109,131 @@ struct indexed_tuple : detail::indexed_tuple<std::make_index_sequence<sizeof...(
 
 template<typename... Ts>
 indexed_tuple(Ts&&...) -> indexed_tuple<Ts...>;
+
+#ifndef DOXYGEN
+namespace detail {
+
+    template<std::size_t i, auto v>
+    struct value_i {
+        static constexpr auto at(index_constant<i>) noexcept {
+            return v;
+        }
+    };
+
+    template<typename I, auto...>
+    struct values;
+    template<std::size_t... i, auto... v> requires(sizeof...(i) == sizeof...(v))
+    struct values<std::index_sequence<i...>, v...> : value_i<i, v>... {
+        using value_i<i, v>::at...;
+    };
+
+    template<auto... v>
+    struct value_list_helper {};
+
+    template<std::size_t i, std::size_t n, auto... values>
+    struct drop_n;
+    template<std::size_t i, std::size_t n, auto v0, auto... v> requires(i < n)
+    struct drop_n<i, n, v0, v...> : drop_n<i+1, n, v...> {};
+    template<std::size_t i, std::size_t n, auto... v> requires(i == n)
+    struct drop_n<i, n, v...> : std::type_identity<value_list_helper<v...>> {};
+
+}  // namespace detail
+#endif  // DOXYGEN
+
+//! Class to represent a list of compile-time values.
+template<auto... v>
+struct values : detail::values<std::make_index_sequence<sizeof...(v)>, v...> {
+    static constexpr std::size_t size = sizeof...(v);
+
+    //! Return a new list with the values from this list, dropping the first n values
+    template<std::size_t n> requires(n <= sizeof...(v))
+    static constexpr auto drop() noexcept {
+        return [] <auto... _v> (const detail::value_list_helper<_v...>&) constexpr {
+            return values<_v...>{};
+        }(typename detail::drop_n<0, n, v...>::type{});
+    }
+
+    //! Return a new list with the values from this list, dropping the last n values
+    template<std::size_t n> requires(n <= sizeof...(v))
+    static constexpr auto crop() noexcept {
+        return [] <std::size_t... i> (const std::index_sequence<i...>&) constexpr {
+            return values<at(index_constant<i>{})...>{};
+        }(std::make_index_sequence<sizeof...(v) - n>{});
+    }
+
+    //! Return a new list with the first n values from this list
+    template<std::size_t n> requires(n <= sizeof...(v))
+    static constexpr auto take() noexcept {
+        return [] <std::size_t... i> (const std::index_sequence<i...>&) constexpr {
+            return values<at(index_constant<i>{})...>{};
+        }(std::make_index_sequence<n>{});
+    }
+
+    //! Return the first value in the list
+    static constexpr auto first() noexcept {
+        return at(index_constant<0>{});
+    }
+
+    //! Return the last value in the list
+    static constexpr auto last() noexcept {
+        return at(index_constant<size-1>{});
+    }
+
+    //! Return the value at the given index in the list
+    template<std::size_t i> requires(i < size)
+    static constexpr auto at(index_constant<i> idx) noexcept {
+        using base = detail::values<std::make_index_sequence<size>, v...>;
+        return base::at(idx);
+    }
+
+    //! Perform a reduction operation on this list
+    template<typename op, typename T>
+    static constexpr auto reduce_with(op&& action, T&& initial) noexcept {
+        return _reduce_with(std::forward<op>(action), std::forward<T>(initial), v...);
+    }
+
+    //! Concatenate this list with another one
+    template<auto... _v>
+    constexpr auto operator+(const values<_v...>&) const {
+        return values<v..., _v...>{};
+    }
+
+    //! Test this list for equality with another one
+    template<auto... _v>
+    constexpr bool operator==(const values<_v...>&) const {
+        if constexpr (sizeof...(_v) == size)
+            return std::conjunction_v<is_equal<v, _v>...>;
+        return false;
+    }
+
+    //! Write this list to the given output stream
+    friend std::ostream& operator<<(std::ostream& s, const values&) {
+        if constexpr (size > 0)
+            _write_to<v...>(s);
+        return s;
+    }
+
+ private:
+    template<auto v0, auto... vs>
+    static void _write_to(std::ostream& s) {
+        s << std::to_string(v0);
+        (..., (s << ", " << std::to_string(vs)));
+    }
+
+    template<typename op, typename T>
+    static constexpr auto _reduce_with(op&&, T&& initial) noexcept {
+        return std::forward<T>(initial);
+    }
+
+    template<typename op, typename T, typename V0, typename... V>
+    static constexpr auto _reduce_with(op&& action, T&& initial, V0&& v0, V&&... values) noexcept {
+        auto next = action(std::forward<T>(initial), std::forward<V0>(v0));
+        if constexpr (sizeof...(V) == 0) {
+            return next;
+        } else {
+            return _reduce_with(std::forward<op>(action), std::move(next), std::forward<V>(values)...);
+        }
+    }
+};
 
 }  // namespace cpputils
