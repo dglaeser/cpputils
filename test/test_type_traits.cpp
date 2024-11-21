@@ -10,7 +10,7 @@ struct Incomplete;
 int main() {
 
     {
-        using unique = cpputils::unique_types_t<int, char, int, double, int, double>;
+        using unique = cpputils::unique_t<int, char, int, double, int, double>;
         static_assert(unique::size == 3);
         static_assert(cpputils::contains_decayed_v<int, unique>);
         static_assert(cpputils::contains_decayed_v<char, unique>);
@@ -25,7 +25,7 @@ int main() {
         using types = cpputils::type_list<int, char, int, double, int, double>;
         static_assert(!cpputils::are_unique_v<types>);
 
-        using unique = cpputils::unique_types_t<types>;
+        using unique = cpputils::unique_t<types>;
         static_assert(cpputils::are_unique_v<unique>);
         static_assert(unique::size == 3);
         static_assert(cpputils::contains_decayed_v<int, unique>);
@@ -40,7 +40,7 @@ int main() {
         static_assert(cpputils::contains_decayed_v<double, merged>);
     }
     {
-        using unique_merged = cpputils::unique_types_t<
+        using unique_merged = cpputils::unique_t<
             cpputils::merged_types_t<cpputils::type_list<int, char, double>, cpputils::type_list<char, double>>
         >;
         static_assert(unique_merged::size == 3);

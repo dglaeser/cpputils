@@ -126,15 +126,15 @@ namespace detail {
 
 //! Type trait to make a list of unique types from a list of types
 template<typename T, typename... Ts>
-struct unique_types : detail::unique_types<T, Ts...> {};
+struct unique : detail::unique_types<T, Ts...> {};
 template<typename... Ts> requires(sizeof...(Ts) > 0)
-struct unique_types<type_list<Ts...>> : detail::unique_types<Ts...> {};
+struct unique<type_list<Ts...>> : detail::unique_types<Ts...> {};
 template<>
-struct unique_types<type_list<>> : std::type_identity<type_list<>> {};
+struct unique<type_list<>> : std::type_identity<type_list<>> {};
 template<typename A, typename... Ts>
-using unique_types_t = typename unique_types<A, Ts...>::type;
+using unique_t = typename unique<A, Ts...>::type;
 
-//! Type trait to merge to lists of types
+//! Type trait to merge two lists of types
 template<typename A, typename... Ts>
 struct merged_types : detail::merged_types<A, Ts...> {};
 template<typename A, typename... Ts>
