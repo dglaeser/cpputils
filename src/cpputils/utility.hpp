@@ -3,12 +3,12 @@
 #include <type_traits>
 #include <concepts>
 #include <utility>
-#include <memory>
 
 #include <cpputils/type_traits.hpp>
 
 namespace cpputils {
 
+//! Stores either an instance or a reference to T, depending on the constructor argument
 template<typename T>
 class value_or_reference {
 public:
@@ -50,7 +50,6 @@ namespace detail {
 
     template<typename... Ts>
     struct indexed;
-
     template<std::size_t... I, typename... Ts>
     struct indexed<std::index_sequence<I...>, Ts...> : indexed_element<I, Ts>... {
         using indexed_element<I, Ts>::index_of...;
@@ -60,6 +59,7 @@ namespace detail {
 }  // namespace detail
 #endif  // DOXYGEN
 
+//! A list of unique types, where each type is assigned a unique index
 template<typename... Ts> requires(are_unique_v<Ts...>)
 struct indexed : detail::indexed<std::make_index_sequence<sizeof...(Ts)>, Ts...> {};
 
@@ -68,48 +68,45 @@ struct indexed : detail::indexed<std::make_index_sequence<sizeof...(Ts)>, Ts...>
 namespace detail {
 
     template<std::size_t I, typename T>
-    struct variadic_element {
+    struct indexed_tuple_element {
         using index = index_constant<I>;
 
-        constexpr variadic_element(T t) noexcept : _storage{std::forward<T>(t)} {}
+        constexpr indexed_tuple_element(T t) noexcept : _storage{std::forward<T>(t)} {}
 
         template<typename _T> requires(std::is_same_v<std::remove_cvref_t<T>, std::remove_cvref_t<_T>>)
         constexpr index index_of() const noexcept { return {}; }
         constexpr index index_of(const T&) const noexcept { return {}; }
 
-        constexpr const std::remove_cvref_t<T>& get(const index&) const noexcept { return _storage.get(); }
-        constexpr std::remove_cvref_t<T>& get(const index&) noexcept { return _storage.get(); }
+        constexpr const auto& get(const index&) const noexcept { return _storage.get(); }
+        constexpr auto& get(const index&) noexcept { return _storage.get(); }
 
     private:
         value_or_reference<T> _storage;
     };
 
     template<typename... Ts>
-    struct variadic_accessor;
-
+    struct indexed_tuple;
     template<std::size_t... I, typename... Ts>
-    struct variadic_accessor<std::index_sequence<I...>, Ts...> : variadic_element<I, Ts>... {
-        constexpr variadic_accessor(Ts... ts) noexcept : variadic_element<I, Ts>(std::forward<Ts>(ts))... {}
-        using variadic_element<I, Ts>::index_of...;
-        using variadic_element<I, Ts>::get...;
+    struct indexed_tuple<std::index_sequence<I...>, Ts...> : indexed_tuple_element<I, Ts>... {
+        constexpr indexed_tuple(Ts... ts) noexcept : indexed_tuple_element<I, Ts>(std::forward<Ts>(ts))... {}
+        using indexed_tuple_element<I, Ts>::index_of...;
+        using indexed_tuple_element<I, Ts>::get...;
     };
 
 }  // namespace detail
 #endif  // DOXYGEN
 
-template<typename... Ts>
-    requires(are_unique_v<Ts...>)
-struct variadic_accessor : detail::variadic_accessor<std::make_index_sequence<sizeof...(Ts)>, Ts...> {
+//! Stores a set unique types by reference or value and provides access to them via unique indices
+template<typename... Ts> requires(are_unique_v<Ts...>)
+struct indexed_tuple : detail::indexed_tuple<std::make_index_sequence<sizeof...(Ts)>, Ts...> {
  private:
-    using base = detail::variadic_accessor<std::make_index_sequence<sizeof...(Ts)>, Ts...>;
+    using base = detail::indexed_tuple<std::make_index_sequence<sizeof...(Ts)>, Ts...>;
 
  public:
-    constexpr variadic_accessor(Ts... ts) noexcept
-    : base(std::forward<Ts>(ts)...)
-    {}
+    constexpr indexed_tuple(Ts... ts) noexcept : base(std::forward<Ts>(ts)...) {}
 };
 
 template<typename... Ts>
-variadic_accessor(Ts&&...) -> variadic_accessor<Ts...>;
+indexed_tuple(Ts&&...) -> indexed_tuple<Ts...>;
 
 }  // namespace cpputils
