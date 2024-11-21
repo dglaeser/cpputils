@@ -10,6 +10,16 @@ namespace cpputils {
 template<std::size_t i>
 using index_constant = std::integral_constant<std::size_t, i>;
 
+//! Instance of a compile-time index
+template<std::size_t i>
+inline constexpr index_constant<i> ic{};
+
+//! Type trait to check equality of two values
+template<auto a, auto b> struct is_equal : std::bool_constant<(a == b)> {};
+
+//! Type trait to check if a is smaller than b
+template<auto a, auto b> struct is_less : std::bool_constant<(a < b)> {};
+
 //! Wraps a type trait to evaluate it with the decay_t of a given type
 template<template<typename> typename trait>
 struct decayed_trait {

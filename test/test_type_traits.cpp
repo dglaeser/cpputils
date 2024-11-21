@@ -10,6 +10,14 @@ struct incomplete;
 int main() {
 
     {
+        static_assert(cpputils::is_equal<1, 1>::value);
+        static_assert(!cpputils::is_equal<0, 1>::value);
+
+        static_assert(!cpputils::is_less<1, 1>::value);
+        static_assert(!cpputils::is_less<1, 0>::value);
+        static_assert(cpputils::is_less<0, 1>::value);
+    }
+    {
         using unique = cpputils::unique_t<int, char, int, double, int, double>;
         static_assert(unique::size == 3);
         static_assert(cpputils::contains_decayed_v<int, unique>);
