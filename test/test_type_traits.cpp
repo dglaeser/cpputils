@@ -18,6 +18,10 @@ int main() {
         static_assert(cpputils::contains_decayed_v<double, int, char, double>);
     }
     {
+        static_assert(cpputils::are_unique_v<int, char>);
+        static_assert(cpputils::are_unique_v<int, char, int&>);
+        static_assert(!cpputils::are_unique_v<int, char, int>);
+
         using types = cpputils::type_list<int, char, int, double, int, double>;
         static_assert(!cpputils::are_unique_v<types>);
 
