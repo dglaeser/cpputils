@@ -33,7 +33,7 @@ int main() {
         static_assert(cpputils::contains_decayed_v<double, unique>);
     }
     {
-        using merged = cpputils::merged_types_t<cpputils::type_list<int>, cpputils::type_list<char, double>>;
+        using merged = cpputils::merged_t<cpputils::type_list<int>, cpputils::type_list<char, double>>;
         static_assert(merged::size == 3);
         static_assert(cpputils::contains_decayed_v<int, merged>);
         static_assert(cpputils::contains_decayed_v<char, merged>);
@@ -41,7 +41,7 @@ int main() {
     }
     {
         using unique_merged = cpputils::unique_t<
-            cpputils::merged_types_t<cpputils::type_list<int, char, double>, cpputils::type_list<char, double>>
+            cpputils::merged_t<cpputils::type_list<int, char, double>, cpputils::type_list<char, double>>
         >;
         static_assert(unique_merged::size == 3);
         static_assert(cpputils::contains_decayed_v<int, unique_merged>);
