@@ -13,28 +13,19 @@ template<typename T>
 class value_or_reference {
 public:
     static constexpr bool holds_reference = std::is_lvalue_reference_v<T>;
-    using stored = std::conditional_t<holds_reference, T, std::remove_cvref_t<T>>;
+    using stored_t = std::conditional_t<holds_reference, T, std::remove_cvref_t<T>>;
 
-    template<typename _T> requires(std::convertible_to<_T, stored>)
+    template<std::convertible_to<stored_t> _T>
     constexpr explicit value_or_reference(_T&& value) noexcept
     : _value{std::forward<_T>(value)}
     {}
 
-    template<typename S> requires(!std::is_lvalue_reference_v<S>)
-    constexpr T&& get(this S&& self) noexcept {
-        return std::move(self._value);
-    }
-
-    template<typename S>
-    constexpr auto& get(this S& self) noexcept {
-        if constexpr (std::is_const_v<S>)
-            return std::as_const(self._value);
-        else
-            return self._value;
-    }
+    constexpr T&& get() && noexcept { return std::move(_value); }
+    constexpr auto& get() & noexcept { return _value; }
+    constexpr const auto& get() const & noexcept { return _value; }
 
 private:
-    stored _value;
+    stored_t _value;
 };
 
 template<typename T>
