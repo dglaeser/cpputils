@@ -15,6 +15,7 @@ int main() {
         static_assert(cpputils::contains_decayed_v<int, unique>);
         static_assert(cpputils::contains_decayed_v<char, unique>);
         static_assert(cpputils::contains_decayed_v<double, unique>);
+        static_assert(cpputils::contains_decayed_v<double, int, char, double>);
     }
     {
         using types = cpputils::type_list<int, char, int, double, int, double>;
